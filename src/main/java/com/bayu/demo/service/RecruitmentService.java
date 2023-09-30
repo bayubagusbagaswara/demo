@@ -10,4 +10,5 @@ public interface RecruitmentService {
     List<RecruitmentDTO> getAllRecruitments();
 
     // get by id
+    RecruitmentDTO getJobById(String id);
 }
