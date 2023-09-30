@@ -1,6 +1,5 @@
 package com.bayu.demo.config;
 
-import com.bayu.demo.entity.Role;
 import com.bayu.demo.service.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -27,7 +26,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                                 .requestMatchers("/api/auth/**").permitAll()
-                                .requestMatchers("/api/recruitments/**").hasRole(Role.USER.name())
+                                .requestMatchers("/api/recruitments/**").authenticated()
                                 .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
