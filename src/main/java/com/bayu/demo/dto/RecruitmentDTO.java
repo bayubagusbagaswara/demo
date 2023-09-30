@@ -1,5 +1,6 @@
 package com.bayu.demo.dto;
 
+import com.google.gson.annotations.SerializedName;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,11 +16,13 @@ public class RecruitmentDTO {
 
     private String type;
 
-    private String created_at;
+    @SerializedName("created_at")
+    private String createdAt;
 
     private String company;
 
-    private String company_url;
+    @SerializedName("company_url")
+    private String companyUrl;
 
     private String location;
 
