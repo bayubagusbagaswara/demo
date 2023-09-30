@@ -3,6 +3,9 @@ package com.bayu.demo.service.impl;
 import com.bayu.demo.dto.RecruitmentDTO;
 import com.bayu.demo.service.RecruitmentService;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.reflect.TypeToken;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -10,9 +13,10 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
+@Slf4j
 @Service
 public class RecruitmentServiceImpl implements RecruitmentService {
 
@@ -21,7 +25,7 @@ public class RecruitmentServiceImpl implements RecruitmentService {
     @Override
     public List<RecruitmentDTO> getAllRecruitments() {
         try {
-            List<RecruitmentDTO> recruitmentDTOList = new ArrayList<>();
+            List<RecruitmentDTO> jobs = new ArrayList<>();
 
             // Create a URL object
             URL url = new URL(API_URL_ALL_RECRUITMENTS);
@@ -49,20 +53,24 @@ public class RecruitmentServiceImpl implements RecruitmentService {
 
                 // Parse the JSON array response using Gson
                 Gson gson = new Gson();
-                RecruitmentDTO[] jsonArray = gson.fromJson(response.toString(), RecruitmentDTO[].class);
+                JsonArray jsonArray = gson.fromJson(response.toString(), JsonArray.class);
+                java.lang.reflect.Type entityType = new TypeToken<List<RecruitmentDTO>>() {}.getType();
 
-                // Work with the parsed JSON array
-                recruitmentDTOList.addAll(Arrays.asList(jsonArray));
-            } else {
-                System.out.println("HTTP Request Failed with Response Code: " + responseCode);
+                // Parse the JSON array into a list of MyEntity objects
+                jobs = gson.fromJson(jsonArray, entityType);
+
+                for (RecruitmentDTO recruitmentDTO : jobs) {
+                    log.info("Id : {}", recruitmentDTO.getId());
+                    log.info("Created At : {}", recruitmentDTO.getCreatedAt());
+                    log.info("Company URL : {}", recruitmentDTO.getCompanyUrl());
+                }
             }
             // Close the connection
             connection.disconnect();
-
-            return recruitmentDTOList;
+            return jobs;
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
+        return Collections.emptyList();
     }
 }
