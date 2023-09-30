@@ -21,6 +21,7 @@ import java.util.List;
 public class RecruitmentServiceImpl implements RecruitmentService {
 
     private static final String API_URL_ALL_RECRUITMENTS = "https://dev6.dansmultipro.com/api/recruitment/positions.json";
+    private static final String API_URL_JOB_BY_ID = "https://dev6.dansmultipro.com/api/recruitment/positions";
 
     @Override
     public List<RecruitmentDTO> getAllRecruitments() {
@@ -72,5 +73,49 @@ public class RecruitmentServiceImpl implements RecruitmentService {
             e.printStackTrace();
         }
         return Collections.emptyList();
+    }
+
+    @Override
+    public RecruitmentDTO getJobById(String id) {
+        try {
+            RecruitmentDTO job = new RecruitmentDTO();
+            // Create a URL object
+            URL url = new URL(API_URL_JOB_BY_ID + "/" + id);
+
+            // Open a connection to the URL
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+            // Set the HTTP method (GET by default)
+            connection.setRequestMethod("GET");
+
+            // Get the response code
+            int responseCode = connection.getResponseCode();
+
+            // Check if the request was successful (HTTP 200 OK)
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                // Read the response from the API
+                BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                String inputLine;
+                StringBuilder response = new StringBuilder();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+
+                Gson gson = new Gson();
+                job = gson.fromJson(response.toString(), RecruitmentDTO.class);
+
+                log.info("Id : {}", job.getId());
+                log.info("Created At : {}", job.getCreatedAt());
+                log.info("Company URL : {}", job.getCompanyUrl());
+            }
+            // Close the connection
+            connection.disconnect();
+            return job;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
